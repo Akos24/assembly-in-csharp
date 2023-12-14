@@ -96,3 +96,57 @@ JNE:
 * CNST = The index of the instruction that the program will go to if the instruction returns false.
 * SRC|CNST = 2 parameters are like this one. The program will check whether these two parameters are equal.
 * Correct syntax examples:
+  * JNE 3 A D (if A != D goto third command)
+  * JNE 0 A 3 (if A != 3 goto zeroth command)
+  * JNE 1 3 4 (if 3 != 4 goto first command - This of course will make an infinite loop)
+  * JNE 3 A A (if A != A goto third command - Since A will always equal A, so this command will be ignored)
+* Incorrect syntax examples:
+  * JNE A B 3
+  * JNE A B
+  * JNE A B D C
+
+One code example:
+
+1,3,5,8
+SUB B B 1
+MOV C B
+ADD C C 1
+JNE 2 C 4
+
+(A = 1, B = 3, C = 5, D = 8)
+SUB B B 1 --> (B = 3 - 1 --> B = 2)
+MOV C B --> (C = 2)
+ADD C C 1 --> (C = 3)
+JNE 2 C 4 --> (false)
+ADD C C 1 --> (C = 4)
+JNE 2 C 4 --> (true)
+
+Output: 1,2,4,8
+
+Step 3:
+Run the command. It the syntaxes are correct, the program will write the updated register values into a TXT file called "output.txt". The output should look like the output above.
+
+Step 4:
+Check the output.txt file for the updated register.
+
+## How to install and use the project
+Step 1:
+Download the reprository as a ZIP file, and unzip it
+Step 2:
+Step into the folder
+Step 3:
+Run the Solution app with the ".sln" extension
+Step 4:
+Run the Console App after writing the command(s) into the input.txt file (exact steps above)
+
+## How to make use of this project
+If you want to work with registers virtually, and use Assembly in the form of a C# App, you can try that out with this program.
+
+## Find a bug?
+This is a beginner project of mine, and it may contain some bugs. If it does feel free to make pull requests to my code, and write down what I could improve in my code. I'm keen on improving my coding skills.
+
+## Acknowledgements
+I would like to express my gratitude to Óbuda University for providing the educational foundation and resources that contributed to the development of this C# project.
+
+## Contact
+If you would like to contact me, write me a message via LinkedIn: https://www.linkedin.com/in/%C3%A1kos-ir%C3%B3-016b4a293/
