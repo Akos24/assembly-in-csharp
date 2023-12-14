@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace PMPHF005_KVZUBT
 {
@@ -17,8 +18,10 @@ namespace PMPHF005_KVZUBT
             string[] regsName = { "A", "B", "C", "D" };
 
             string[] instructions = InstructionReader(fname);
-            
-            for (int i = 0; i < instructions.Length; i++)
+            int instrLength = instructions.Length;
+
+            int i = 0;
+            while (i < instrLength)
             {
                 string[] instruction = instructions[i].Split(" ");
                 string command = instruction[0];
@@ -30,22 +33,71 @@ namespace PMPHF005_KVZUBT
                         string dest = commandParams[0];
                         string src = commandParams[1];
                         MOV(dest, src, regsValue, regsName);
+                        i++;
                         break;
                     case "ADD":
+                        dest = commandParams[0];
+                        string srcOne = commandParams[1];
+                        string srcTwo = commandParams[2];
+                        ADD(dest, srcOne, srcTwo, regsValue, regsName);
+                        i++;
                         break;
                     case "SUB":
+                        dest = commandParams[0];
+                        srcOne = commandParams[1];
+                        srcTwo = commandParams[2];
+                        SUB(dest, srcOne, srcTwo, regsValue, regsName);
+                        i++;
                         break;
                     case "JNE":
+                        int cnst = int.Parse(commandParams[0]);
+                        srcOne = commandParams[1];
+                        srcTwo = commandParams[2];
+                        if (!JNE(srcOne, srcTwo, regsValue, regsName))
+                        {
+                            i = cnst;
+                        } else
+                        {
+                            i++;
+                        }
                         break;
                 }
             }
 
+            string outputFname = "output.txt";
+            string[] register = new string[regsValue.Length];
+            for (int j = 0; j < regsValue.Length; j++)
+            {
+                register[j] = regsValue[j].ToString();
+            }
+            RegisterOutput(outputFname, register);
+        }
+        static void RegisterWriter(int[] regsValue)
+        {
+            foreach (int reg in regsValue)
+            {
+                Console.Write(reg + " ");
+            }
+            Console.WriteLine();
         }
         static string[] RegisterReader(string fname)
         {
             string[] lines = File.ReadAllLines(fname);
             string[] regs = lines[0].Split(",");
             return regs;
+        }
+        static void RegisterOutput(string fname, string[] register)
+        {
+            if (File.Exists(fname))
+            {
+                File.Delete(fname);
+            }
+
+            for (int i = 0; i < register.Length - 1; i++)
+            {
+                File.AppendAllText(fname, register[i] + ",", System.Text.Encoding.UTF8);
+            }
+            File.AppendAllText(fname, register[register.Length - 1], System.Text.Encoding.UTF8);
         }
         static string[] InstructionReader(string fname)
         {
@@ -88,7 +140,7 @@ namespace PMPHF005_KVZUBT
             }
             return -1;
         }
-        static int[] MOV(string dest, string src, int[] regsValue, string[] regsName)
+        static void MOV(string dest, string src, int[] regsValue, string[] regsName)
         {
             if (!IsRegister(regsName, src))
             {
@@ -98,7 +150,74 @@ namespace PMPHF005_KVZUBT
                 int value = regsValue[RegisterIndex(regsName, src)];
                 regsValue[RegisterIndex(regsName, dest)] = value;
             }
-            return regsValue;
+        }
+        static void ADD(string dest, string srcOne, string srcTwo, int[] regsValue, string[] regsName)
+        {
+            if (!IsRegister(regsName, srcOne) && !IsRegister(regsName, srcTwo))
+            {
+                regsValue[RegisterIndex(regsName, dest)] = int.Parse(srcOne) + int.Parse(srcTwo);
+            } else if (IsRegister(regsName, srcOne) && !IsRegister(regsName, srcTwo))
+            {
+                int valueOne = regsValue[RegisterIndex(regsName, srcOne)];
+                regsValue[RegisterIndex(regsName, dest)] = valueOne + int.Parse(srcTwo);
+            }
+            else if (!IsRegister(regsName, srcOne) && IsRegister(regsName, srcTwo))
+            {
+                int valueTwo = regsValue[RegisterIndex(regsName, srcTwo)];
+                regsValue[RegisterIndex(regsName, dest)] = int.Parse(srcOne) + valueTwo;
+
+            } else
+            {
+                int valueOne = regsValue[RegisterIndex(regsName, srcOne)];
+                int valueTwo = regsValue[RegisterIndex(regsName, srcTwo)];
+                regsValue[RegisterIndex(regsName, dest)] = valueOne + valueTwo;
+            }
+        }
+        static void SUB(string dest, string srcOne, string srcTwo, int[] regsValue, string[] regsName)
+        {
+            if (!IsRegister(regsName, srcOne) && !IsRegister(regsName, srcTwo))
+            {
+                regsValue[RegisterIndex(regsName, dest)] = int.Parse(srcOne) - int.Parse(srcTwo);
+            }
+            else if (IsRegister(regsName, srcOne) && !IsRegister(regsName, srcTwo))
+            {
+                int valueOne = regsValue[RegisterIndex(regsName, srcOne)];
+                regsValue[RegisterIndex(regsName, dest)] = valueOne - int.Parse(srcTwo);
+            }
+            else if (!IsRegister(regsName, srcOne) && IsRegister(regsName, srcTwo))
+            {
+                int valueTwo = regsValue[RegisterIndex(regsName, srcTwo)];
+                regsValue[RegisterIndex(regsName, dest)] = int.Parse(srcOne) - valueTwo;
+
+            }
+            else
+            {
+                int valueOne = regsValue[RegisterIndex(regsName, srcOne)];
+                int valueTwo = regsValue[RegisterIndex(regsName, srcTwo)];
+                regsValue[RegisterIndex(regsName, dest)] = valueOne - valueTwo;
+            }
+        }
+        static bool JNE(string srcOne, string srcTwo, int[] regsValue, string[] regsName)
+        {
+            if (!IsRegister(regsName, srcOne) && !IsRegister(regsName, srcTwo))
+            {
+                return int.Parse(srcOne) == int.Parse(srcTwo);
+            }
+            else if (IsRegister(regsName, srcOne) && !IsRegister(regsName, srcTwo))
+            {
+                int valueOne = regsValue[RegisterIndex(regsName, srcOne)];
+                return valueOne == int.Parse(srcTwo);
+            }
+            else if (!IsRegister(regsName, srcOne) && IsRegister(regsName, srcTwo))
+            {
+                int valueTwo = regsValue[RegisterIndex(regsName, srcTwo)];
+                return int.Parse(srcOne) == valueTwo;
+            } else
+            {
+                int valueOne = regsValue[RegisterIndex(regsName, srcOne)];
+                int valueTwo = regsValue[RegisterIndex(regsName, srcTwo)];
+                return valueOne == valueTwo;
+            }
         }
     }
 }
