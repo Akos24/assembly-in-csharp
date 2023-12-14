@@ -20,20 +20,20 @@ Write 4 register values separated with a comma. The values should be whole integ
 Examples:
 
 Good examples:
-2,3,4,5
-1,5,67,-3
--1,-4,12,0
+* 2,3,4,5
+* 1,5,67,-3
+* -1,-4,12,0
 
 Bad examples:
-1,2,3
-2;3;5;7
-1,4,6,8,2
-3.4,3,2,7
+* 1,2,3
+* 2;3;5;7
+* 1,4,6,8,2
+* 3.4,3,2,7
 
 These will be the registers that you will be working with. The first register is register A. The second is register B etc.
 
 Example:
-1,2,3,4 --> (A = 1, B = 2, C = 3, D = 4)
+* 1,2,3,4 --> (A = 1, B = 2, C = 3, D = 4)
 
 After you wrote all 4 registers down separated with a comma, you shall hit a line break
 
@@ -107,21 +107,21 @@ JNE:
 
 One code example:
 
-1,3,5,8
-SUB B B 1
-MOV C B
-ADD C C 1
-JNE 2 C 4
+* 1,3,5,8
+* SUB B B 1
+* MOV C B
+* ADD C C 1
+* JNE 2 C 4
 
-(A = 1, B = 3, C = 5, D = 8)
-SUB B B 1 --> (B = 3 - 1 --> B = 2)
-MOV C B --> (C = 2)
-ADD C C 1 --> (C = 3)
-JNE 2 C 4 --> (false)
-ADD C C 1 --> (C = 4)
-JNE 2 C 4 --> (true)
+* (A = 1, B = 3, C = 5, D = 8)
+* SUB B B 1 --> (B = 3 - 1 --> B = 2)
+* MOV C B --> (C = 2)
+* ADD C C 1 --> (C = 3)
+* JNE 2 C 4 --> (false)
+* ADD C C 1 --> (C = 4)
+* JNE 2 C 4 --> (true)
 
-Output: 1,2,4,8
+* Output: 1,2,4,8
 
 Step 3:
 Run the command. It the syntaxes are correct, the program will write the updated register values into a TXT file called "output.txt". The output should look like the output above.
